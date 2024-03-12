@@ -43,4 +43,17 @@ using UnityEngine;
         hammer,
         axe,
         house
+
+
+    }
+
+    public enum Items{
+        softwood,
+        hardwood,
+        hammer,
+        axe,
+        apple,
+        pear,
+        plum,
+        mushroom
     }

@@ -17,6 +17,7 @@ public class NPCScript : MonoBehaviour
     private int lastTime;
     private int check = 0;
     [SerializeField] private int ponderTime=0;
+    private Dictionary <Items,int> inventory;
 
     //NPCstats
     public int Hunger 
@@ -84,6 +85,10 @@ public class NPCScript : MonoBehaviour
         skills.Add(PersonSkills.Gathering,0);
         skills.Add(PersonSkills.Logging,0);
         note = gameObject.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject;
+        inventory = new Dictionary<Items, int>(); 
+        foreach( Items item in Enum.GetValues(typeof (Items))){
+            inventory.Add(item,0);
+        } 
     }
 
     // Update is called once per frame
@@ -92,6 +97,7 @@ public class NPCScript : MonoBehaviour
         if (!destination && action == Actions.None){
             action = NextAction();
             destination = NextDestination(action);
+            
         }
         if(destination)
         {
@@ -107,12 +113,16 @@ public class NPCScript : MonoBehaviour
             
             }
         }
-        if (canAct){
+        if (canAct)
+        {
             lastTime = townStats.minute;
             note.GetComponent<MeshRenderer>().material = dictionaries.actionSprite[action];
             acting = true;
             canAct = false;
-            }
+        }
+        if(!destination &&!canAct & !acting & action != Actions.None){
+            action = Actions.None;
+        }
         if(acting){
           if(lastTime != townStats.minute){
             lastTime = townStats.minute;
@@ -174,13 +184,17 @@ public class NPCScript : MonoBehaviour
         }
         if(nextAction == Actions.Logging)
         {
+            print("in logging");
             int skillLevel =(int) Math.Log(skills[PersonSkills.Logging],2);
             foreach (GameObject resource in townStats.resourceList)
             {
+
                 Resource res = resource.GetComponent<Resource>();
+                print(resource.tag);
                 if( resource.tag == "wood" && res.ammount > 0)
                 {   print(res.type);
-                    if(res.type == InteractingWith.hardwoodtree && skillLevel < 5) break;
+                    if(res.type == InteractingWith.hardwoodtree && skillLevel < 5) {}
+                    else {
                     if(!nextDestination)
                     {
                         nextDestination = resource;
@@ -191,6 +205,7 @@ public class NPCScript : MonoBehaviour
                         {
                             nextDestination = resource;
                         }
+                    }
                     }
                 }
             }
@@ -209,35 +224,41 @@ public class NPCScript : MonoBehaviour
         return -1;
     }
 
-    public int Gathering(){
+    public int Gathering()
+    {
        // print("gathering");
         //print(resourceInfo.ammount);
         if(resourceInfo.ammount > 0)
         {
-        resourceInfo.ammount --;
-        if(skills.ContainsKey(PersonSkills.Gathering)){
+            resourceInfo.ammount --;
+            if(skills.ContainsKey(PersonSkills.Gathering)){
             skills[PersonSkills.Gathering] += 1;
-        }
-        else{
+            }
+         else{
             skills.Add(PersonSkills.Gathering,0);
-        }
-        if( resourceInfo.type == InteractingWith.mushroom || 
-            resourceInfo.type == InteractingWith.appletree || 
-            resourceInfo.type == InteractingWith.peartree ||
-            resourceInfo.type == InteractingWith.plumtree)
+         }
+            if( resourceInfo.type == InteractingWith.mushroom || 
+                resourceInfo.type == InteractingWith.appletree || 
+                resourceInfo.type == InteractingWith.peartree ||
+                resourceInfo.type == InteractingWith.plumtree)
             {
                 poundsOfFood ++;
                 if(skills.ContainsKey(PersonSkills.GatheringFood))
                 {
-                    skills[PersonSkills.Gathering] += 1;
+                    skills[PersonSkills.GatheringFood] += 1;
                 }
                 else
                 {
                     skills.Add(PersonSkills.GatheringFood,0);
                 }
+                if( resourceInfo.type == InteractingWith.mushroom ) inventory[Items.mushroom] ++;
+                if( resourceInfo.type == InteractingWith.appletree ) inventory[Items.apple] ++;
+                if( resourceInfo.type == InteractingWith.peartree ) inventory[Items.pear] ++;
+                if( resourceInfo.type == InteractingWith.plumtree ) inventory[Items.plum] ++;
             }
             return 0;
-        }else{
+        }else
+        {
             townStats.RemoveResource(resource);
             note.GetComponent<MeshRenderer>().material = dictionaries.actionSprite[Actions.None];
             return -1;
@@ -248,7 +269,11 @@ public class NPCScript : MonoBehaviour
         //print("eating");
         if(poundsOfFood>0 && hunger < 100){
             poundsOfFood--;
-            hunger++;
+            if(inventory[Items.apple]>0) inventory[Items.apple]--;
+            else if(inventory[Items.plum]>0) inventory[Items.plum]--;
+            else if(inventory[Items.pear]>0) inventory[Items.pear]--;
+            else if(inventory[Items.mushroom]>0) inventory[Items.mushroom]--;
+            hunger += 5;
             return 0;
         }
         note.GetComponent<MeshRenderer>().material = dictionaries.actionSprite[Actions.None];
@@ -314,7 +339,35 @@ public class NPCScript : MonoBehaviour
         note.GetComponent<MeshRenderer>().material = dictionaries.actionSprite[Actions.None];
         return -1;
     }
-    public void newDay()
+
+    public int Logging(){
+        if(resourceInfo.ammount > 0)
+        {
+            resourceInfo.ammount --;
+            if(skills.ContainsKey(PersonSkills.Logging)){
+            skills[PersonSkills.Logging] += 1;
+            }
+         else{
+            return -1;
+         }
+            if( resourceInfo.type == InteractingWith.softwoodtree )
+            {
+                inventory[Items.softwood]++;
+                print("$(inventory[Items.softwood] count)");
+            }
+            if( resourceInfo.type == InteractingWith.hardwoodtree )
+            {
+                inventory[Items.hardwood]++;
+            }
+            return 0;
+        }else
+        {
+            townStats.RemoveResource(resource);
+            note.GetComponent<MeshRenderer>().material = dictionaries.actionSprite[Actions.None];
+            return -1;
+        }
+    }
+   public void newDay()
     {
         if(!house) comfort -=5;
         hunger -= 25;

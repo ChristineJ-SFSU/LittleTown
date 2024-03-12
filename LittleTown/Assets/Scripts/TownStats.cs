@@ -66,7 +66,8 @@ void AddDailyResource()
     {
         if( Random.Range(0,10) == 9)
         {
-            newResource = Instantiate(daylyResources[Random.Range(0,daylyResources.Count)], ground.transform);
+            newResource = Instantiate(daylyResources[Random.Range(0,daylyResources.Count)]);
+            newResource.transform.position = ground.transform.position;
             AddResource(newResource);
         }
     }
@@ -91,7 +92,9 @@ public void RemoveResource(GameObject resource)
         resourceList.Remove(resource);
         Destroy(resource);
     } 
-    if(type == InteractingWith.softwoodtree) softwoodCount--;
+    if(type == InteractingWith.softwoodtree) {
+        softwoodCount--;
+        resourceList.Remove(resource);}
     if(type == InteractingWith.hardwoodtree) hardwoodCount--;
     
     

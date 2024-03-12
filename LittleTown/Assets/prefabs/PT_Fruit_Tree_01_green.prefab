@@ -268,7 +268,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 6
   isEmpty: 0
-  ammount: 0
+  ammount: 20
   growthAmmount: 0
 --- !u!1 &7547779705289426318
 GameObject:
