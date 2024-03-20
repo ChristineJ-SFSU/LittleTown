@@ -36,7 +36,8 @@ using UnityEngine;
         bed,
         goodbed,
         softwoodtree,
-        hardwoodtree
+        hardwoodtree,
+        rock
 
     }
     public enum CreateItems{
@@ -55,5 +56,6 @@ using UnityEngine;
         apple,
         pear,
         plum,
-        mushroom
+        mushroom,
+        rock
     }

@@ -10,6 +10,7 @@ public class TownStats : MonoBehaviour
     public int foodResourceCount = 0;
     public int softwoodCount;
     public int hardwoodCount;
+    public int rockCount;
     public List<GameObject> villagerList;
     public List<GameObject> resourceList;
     public List<GameObject> daylyResources;
@@ -92,12 +93,25 @@ public void RemoveResource(GameObject resource)
         resourceList.Remove(resource);
         Destroy(resource);
     } 
-    if(type == InteractingWith.softwoodtree) {
+    if(type == InteractingWith.softwoodtree) 
+    {
         softwoodCount--;
         resourceList.Remove(resource);
-        Destroy(resource);}
+        Destroy(resource);
+        }
         
-    if(type == InteractingWith.hardwoodtree) hardwoodCount--;
+    if(type == InteractingWith.hardwoodtree) 
+    {
+        hardwoodCount--;
+        resourceList.Remove(resource);
+        Destroy(resource);
+    }
+     if(type == InteractingWith.rock) 
+    {
+        rockCount--;
+        resourceList.Remove(resource);
+        Destroy(resource);
+    }
     
     
 }
@@ -111,6 +125,7 @@ public void AddResource(GameObject resource)
     ) foodResourceCount++;
     if(type == InteractingWith.softwoodtree) softwoodCount++;
     if(type == InteractingWith.hardwoodtree) hardwoodCount++;
+    if(type == InteractingWith.rock) rockCount++;
     resourceList.Add(resource);
 }
 }

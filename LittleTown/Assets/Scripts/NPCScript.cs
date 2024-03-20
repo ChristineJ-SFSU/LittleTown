@@ -84,6 +84,7 @@ public class NPCScript : MonoBehaviour
         skills = new Dictionary<PersonSkills, int>();
         skills.Add(PersonSkills.Gathering,0);
         skills.Add(PersonSkills.Logging,0);
+        skills.Add(PersonSkills.Mining,0);
         note = gameObject.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject;
         inventory = new Dictionary<Items, int>(); 
         foreach( Items item in Enum.GetValues(typeof (Items))){
@@ -142,7 +143,16 @@ public class NPCScript : MonoBehaviour
         if (hunger<100 && poundsOfFood > 0) return Actions.Eat;
         if (poundsOfFood < 10 && townStats.foodResourceCount>0) return Actions.Gathering;
         if( sleep<50 || (sleep < hunger)) return Actions.Sleep;
-        if(sleep >75 && hunger > 75 && skills.ContainsKey(PersonSkills.Logging)) return Actions.Logging;
+        if(sleep >75 && hunger > 75 )
+        {
+            if(0 == UnityEngine.Random.Range(0,2))
+            {
+                return Actions.Logging;
+            }else
+            {
+                return Actions.Mining;
+            }
+        }
         return Actions.Ponder;
     }
     private GameObject NextDestination(Actions nextAction)
@@ -209,6 +219,29 @@ public class NPCScript : MonoBehaviour
                 }
             }
         }
+         if(nextAction == Actions.Mining)
+        {
+            foreach (GameObject resource in townStats.resourceList)
+            {
+
+                Resource res = resource.GetComponent<Resource>();
+                if( resource.tag == "rock" && res.ammount > 0)
+                {
+                    
+                    if(!nextDestination)
+                    {
+                        nextDestination = resource;
+                    }
+                    else
+                    {
+                        if (Vector3.Distance(transform.position, resource.transform.position) < Vector3.Distance(transform.position,nextDestination.transform.position))
+                        {
+                            nextDestination = resource;
+                        }
+                    }
+                }
+            }
+        }
         return nextDestination;
         
     }
@@ -221,6 +254,7 @@ public class NPCScript : MonoBehaviour
         if(action == Actions.Ponder) return Pondering();
         if(action == Actions.Sleep) return Sleeping();
         if(action == Actions.Logging) return Logging();
+        if(action == Actions.Mining) return Mining();
         return -1;
     }
 
@@ -361,6 +395,28 @@ public class NPCScript : MonoBehaviour
             {
                 inventory[Items.hardwood]++;
             }
+            return 0;
+        }else
+        {
+            townStats.RemoveResource(resource);
+            note.GetComponent<MeshRenderer>().material = dictionaries.actionSprite[Actions.None];
+            return -1;
+        }
+    }
+    public int Mining(){
+        print("in mining");
+        print(resourceInfo);
+        if(resourceInfo.ammount > 0)
+        {
+            resourceInfo.ammount --;
+            if(skills.ContainsKey(PersonSkills.Mining)){
+            skills[PersonSkills.Mining] += 1;
+            }
+         else{
+            return -1;
+         }
+            inventory[Items.rock]++;
+            print($"{inventory[Items.rock]} count");
             return 0;
         }else
         {

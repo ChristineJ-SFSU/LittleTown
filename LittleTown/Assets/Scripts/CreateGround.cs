@@ -42,6 +42,7 @@ public class CreateGround : MonoBehaviour
                    // print(resources.Count);
                     newResource = Instantiate(resources[Random.Range(0,resources.Count)], gameObject.transform);
                     newResource.transform.position = new Vector3(x,0,z);
+                    print(newResource);
                     townStats.AddResource(newResource);
                 }
         }
