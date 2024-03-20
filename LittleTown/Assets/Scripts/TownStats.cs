@@ -94,7 +94,9 @@ public void RemoveResource(GameObject resource)
     } 
     if(type == InteractingWith.softwoodtree) {
         softwoodCount--;
-        resourceList.Remove(resource);}
+        resourceList.Remove(resource);
+        Destroy(resource);}
+        
     if(type == InteractingWith.hardwoodtree) hardwoodCount--;
     
     

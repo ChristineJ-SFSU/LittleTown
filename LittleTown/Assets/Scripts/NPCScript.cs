@@ -106,6 +106,7 @@ public class NPCScript : MonoBehaviour
         
             if (Vector3.Distance(transform.position, destination.transform.position) < .5f)
             {
+                print("at des");
             resource = destination;
             resourceInfo = resource.GetComponent<Resource>();
             destination = null;
@@ -184,15 +185,13 @@ public class NPCScript : MonoBehaviour
         }
         if(nextAction == Actions.Logging)
         {
-            print("in logging");
             int skillLevel =(int) Math.Log(skills[PersonSkills.Logging],2);
             foreach (GameObject resource in townStats.resourceList)
             {
 
                 Resource res = resource.GetComponent<Resource>();
-                print(resource.tag);
                 if( resource.tag == "wood" && res.ammount > 0)
-                {   print(res.type);
+                {
                     if(res.type == InteractingWith.hardwoodtree && skillLevel < 5) {}
                     else {
                     if(!nextDestination)
@@ -221,6 +220,7 @@ public class NPCScript : MonoBehaviour
         if(action == Actions.Eat) return Eating();
         if(action == Actions.Ponder) return Pondering();
         if(action == Actions.Sleep) return Sleeping();
+        if(action == Actions.Logging) return Logging();
         return -1;
     }
 
@@ -341,6 +341,8 @@ public class NPCScript : MonoBehaviour
     }
 
     public int Logging(){
+        print("in Logging");
+        print(resourceInfo);
         if(resourceInfo.ammount > 0)
         {
             resourceInfo.ammount --;
@@ -353,7 +355,7 @@ public class NPCScript : MonoBehaviour
             if( resourceInfo.type == InteractingWith.softwoodtree )
             {
                 inventory[Items.softwood]++;
-                print("$(inventory[Items.softwood] count)");
+                print($"{inventory[Items.softwood]} count");
             }
             if( resourceInfo.type == InteractingWith.hardwoodtree )
             {
