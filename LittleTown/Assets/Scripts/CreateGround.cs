@@ -9,7 +9,7 @@ public class CreateGround : MonoBehaviour
     public GameObject treeSoft;
     public GameObject treeHard;
 
-    public List<GameObject> food;
+    public List<GameObject> resources;
     public TownStats townStats;
     // Start is called before the first frame update
     void Start()
@@ -39,7 +39,8 @@ public class CreateGround : MonoBehaviour
                     newResource.transform.position = new Vector3(x,0,z);
                     townStats.AddResource(newResource);
                 }if(rand <2){
-                    newResource = Instantiate(food[Random.Range(0,food.Count)], gameObject.transform);
+                   // print(resources.Count);
+                    newResource = Instantiate(resources[Random.Range(0,resources.Count)], gameObject.transform);
                     newResource.transform.position = new Vector3(x,0,z);
                     townStats.AddResource(newResource);
                 }
